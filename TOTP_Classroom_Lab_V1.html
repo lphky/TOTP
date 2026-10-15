@@ -1,0 +1,1402 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b1630">
+<meta name="description" content="以真正 RFC 6238 TOTP、Authenticator QR Code 和離線實驗學習軟件權標。">
+<title>TOTP Classroom Lab — Soft Token 教學實驗室</title>
+<style>
+:root{--bg:#f3f6fc;--paper:#fff;--ink:#15233e;--sub:#61718b;--border:#e4eaf3;--blue:#3c6df0;--cyan:#20aecd;--navy:#0b1630;--green:#13936b;--amber:#b97517;--red:#d44857;--shadow:0 12px 38px rgba(21,42,87,.055);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font-size:15px}button,input{font:inherit}button{cursor:pointer}button:disabled{opacity:.5;cursor:not-allowed}button:focus-visible,input:focus-visible{outline:3px solid #8db3ff;outline-offset:2px}button:active:not(:disabled){transform:translateY(1px)}.hidden,[hidden]{display:none!important}
+.shell{max-width:1500px;margin:auto;padding:0 32px 34px}.mast{background:var(--navy);color:#fff;overflow:hidden;position:relative}.mast:before{content:"";position:absolute;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,#2052b35b,transparent 68%);right:-120px;top:-320px;pointer-events:none}.topbar{display:flex;align-items:center;justify-content:space-between;gap:20px;position:relative;padding:23px 0 22px}.brand{display:flex;align-items:center;gap:14px}.logo{width:45px;height:45px;flex-shrink:0;border-radius:14px;background:linear-gradient(135deg,#53e4eb,#3861f7);display:grid;place-items:center;box-shadow:0 6px 20px #298cb655}.logo svg{height:26px;width:26px;stroke:white;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.brand strong{display:block;font-size:21px;letter-spacing:-.5px}.brand span{display:block;color:#a8b7d6;font-size:12px;margin-top:2px}.top-actions{display:flex;align-items:center;gap:9px}.tag{display:inline-flex;align-items:center;gap:6px;font-size:12px;background:#ffffff12;border:1px solid #ffffff25;border-radius:999px;padding:7px 11px;color:#c1d6f8}.tag:before{content:"";width:7px;height:7px;border-radius:50%;background:#67e1b1}.mast .ghost{background:#ffffff11;border:1px solid #ffffff28;color:white}.mast .ghost:hover{background:#ffffff21}.mastintro{position:relative;padding:1px 0 34px;display:flex;align-items:center;gap:20px;justify-content:space-between}.mastintro h1{font-weight:800;font-size:clamp(24px,2.6vw,34px);line-height:1.35;letter-spacing:-.8px;margin:6px 0 9px}.mastintro p{color:#b3c6e6;line-height:1.7;font-size:14px;margin:0;max-width:660px}.hero-pills{display:flex;gap:8px;flex-wrap:wrap}.hero-pill{border:1px solid #588ac47a;background:#29548a4d;color:#bedaff;padding:10px 12px;border-radius:11px;font-weight:750;font-size:12px;white-space:nowrap}
+.content{padding-top:24px}.notice{display:flex;gap:12px;align-items:center;background:#fff8e8;border:1px solid #f1e2b9;color:#79551b;border-radius:14px;padding:12px 17px;margin-bottom:18px;font-size:12px;line-height:1.6}.notice b{font-weight:800}.notice svg{flex-shrink:0}.main-grid{display:grid;grid-template-columns:minmax(230px,.77fr) minmax(310px,1fr) minmax(335px,1.1fr);gap:18px;align-items:stretch}.panel{background:var(--paper);border:1px solid var(--border);border-radius:19px;box-shadow:var(--shadow);overflow:hidden;min-width:0}.panel-head{padding:22px 22px 15px;display:flex;align-items:flex-start;justify-content:space-between;gap:9px}.eyebrow{text-transform:uppercase;font-weight:800;letter-spacing:1.1px;color:#8b9bb6;font-size:10px}.panel-title{font-size:17px;margin:6px 0 0;font-weight:800;letter-spacing:-.3px}.mini-label{font-size:11px;color:#8b9bb6;text-transform:uppercase;font-weight:750;letter-spacing:1px}.btn{border:1px solid var(--border);background:white;color:var(--ink);border-radius:11px;padding:10px 14px;font-size:13px;font-weight:750;display:inline-flex;align-items:center;justify-content:center;gap:7px;transition:background .15s,box-shadow .15s,transform .1s;white-space:nowrap}.btn:hover{background:#f1f5fd}.btn svg{width:16px;height:16px}.btn.sm{font-size:12px;padding:8px 10px;border-radius:9px}.btn.primary{background:var(--blue);border-color:var(--blue);color:#fff;box-shadow:0 5px 14px #416bf027}.btn.primary:hover{background:#2d5adf}.btn.danger{color:#c83347;border-color:#f3cbd1}.btn.danger:hover{background:#fff0f2}.btn.soft{color:#2850ae;background:#ecf2ff;border-color:#ecf2ff}.btn.soft:hover{background:#e1ebff}.btn.icononly{padding:7px;min-width:33px;min-height:33px}.btn.wide{width:100%}.btn-icon{font-size:17px;line-height:1}.tiny{font-size:11px;color:#8392a9}.muted{color:var(--sub)}.hr{border:0;border-top:1px solid var(--border);margin:0}
+.accounts-panel{display:flex;flex-direction:column;min-height:510px}.accounts-panel .list-body{padding:6px 10px 12px;flex:1}.account-item{display:flex;align-items:center;gap:8px;border:1px solid transparent;border-radius:12px;padding:8px;margin:0 0 4px}.account-item.active{background:#edf3ff;border-color:#cfe0ff}.account-item:hover{background:#f5f7fc}.account-item.active:hover{background:#edf3ff}.account-main{display:flex;gap:10px;align-items:center;flex:1;min-width:0;background:none;border:none;padding:4px 0;text-align:left;color:inherit}.avatar{display:grid;place-items:center;width:36px;height:36px;background:#e7edf8;border-radius:11px;font-size:15px;color:#5366a2;flex-shrink:0;font-weight:900}.account-item.active .avatar{background:#d4e1ff;color:#3354b6}.account-label{min-width:0}.account-label strong{display:block;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font-size:13px}.account-label small{display:block;font-size:10px;color:#8997ad;margin-top:3px}.action-icons{display:flex;gap:2px}.action-icons button{border:0;background:transparent;color:#8191a7;border-radius:7px;width:27px;height:29px;display:grid;place-items:center;opacity:0}.account-item:hover .action-icons button,.account-item.active .action-icons button,.action-icons button:focus-visible{opacity:1}.action-icons button:hover{background:#dce7fa;color:#304e8c}.action-icons svg{height:14px;width:14px}.accounts-foot{padding:16px 19px 19px;background:#fafbff;border-top:1px solid var(--border)}.account-count{display:flex;justify-content:space-between;color:#7889a3;font-size:12px;margin-bottom:15px}.empty{text-align:center;padding:27px 12px;color:#71819b;line-height:1.8;font-size:13px}
+.setup-panel{display:flex;flex-direction:column}.selected-account{text-align:center;min-height:22px;font-weight:850;font-size:17px;margin:0 20px;overflow-wrap:anywhere}.issuer{text-align:center;font-size:12px;color:#8494ab;margin-top:5px}.qr-area{padding:14px 23px 20px;display:grid;place-items:center;flex:1;min-height:278px}.qr-frame{padding:12px;background:white;border:1px solid #e6eaf2;box-shadow:0 6px 22px #13264709;border-radius:14px;display:grid;place-items:center;max-width:100%}.qr-frame svg{display:block;width:min(235px,100%);height:auto;aspect-ratio:1}.qr-hidden{min-height:257px;width:100%;display:flex;align-items:center;justify-content:center;flex-direction:column;background:#f5f7fc;border:1px dashed #d2dced;border-radius:14px;gap:9px;color:#7888a0}.qr-hidden span{font-size:34px}.scan-help{text-align:center;color:#7c8ba3;font-size:12px;line-height:1.65;margin:0 20px 14px}.setup-buttons{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;padding:0 18px 17px}.secret-box{margin:0 17px 19px;background:#f8faff;border:1px solid var(--border);border-radius:12px;padding:13px 14px}.secret-top{display:flex;align-items:center;justify-content:space-between;gap:8px}.secret-value{background:#fff;border:1px solid #e5eaf3;border-radius:9px;padding:10px;font:700 12px/1.7 ui-monospace,Consolas,monospace;letter-spacing:1px;overflow-wrap:anywhere;margin-top:10px;user-select:all}.secret-hint{font-size:11px;color:#9b763f;margin-top:8px;line-height:1.5}
+.otp-panel{display:flex;flex-direction:column}.otp-panel .panel-head{padding-bottom:8px}.live-dot{display:flex;align-items:center;gap:6px;color:var(--green);font-weight:750;font-size:11px}.live-dot:before{content:"";width:7px;height:7px;border-radius:50%;background:#27c58b;box-shadow:0 0 0 4px #d9f6e9}.otp-hero{padding:15px 22px 23px;display:flex;flex-direction:column;align-items:center;flex:1}.token-label{font-size:12px;font-weight:750;color:#7a8ba6;letter-spacing:1px;margin:16px 0 12px}.otp-digits{font-family:ui-monospace,Consolas,"SFMono-Regular",monospace;font-size:clamp(43px,4.1vw,62px);font-variant-numeric:tabular-nums;font-weight:900;letter-spacing:3px;white-space:nowrap;color:#192b57;line-height:1.18}.otp-digits.new{animation:digitPop .27s ease-out}@keyframes digitPop{0%{opacity:.3;transform:translateY(5px) scale(.97)}100%{opacity:1;transform:none}}.token-desc{color:#96a2b6;font-size:12px;margin:12px 0 25px}.timer-row{display:flex;gap:15px;align-items:center;justify-content:center;width:100%}.ring{--p:100%;--ring-color:#3776ed;background:conic-gradient(var(--ring-color) var(--p),#e9edf6 var(--p));width:77px;height:77px;border-radius:50%;padding:7px;display:grid;place-items:center;flex-shrink:0}.ring-inner{background:white;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:50%;height:100%;width:100%;font-size:23px;font-weight:900;font-variant-numeric:tabular-nums;color:#1d3358}.ring-inner small{font-size:8px;color:#8998ae;font-weight:700;margin-top:-2px}.timer-copy{font-size:13px;color:#546a89;line-height:1.8}.timer-copy b{font-size:15px;color:#1b396e}.timer-copy small{display:block;font-size:11px;color:#8b9bb3}.verify{border-top:1px solid var(--border);padding:17px 21px 21px;background:#fcfdff}.verify h3{margin:0 0 7px;font-size:14px}.verify p{margin:0 0 13px;font-size:11px;line-height:1.6;color:#8b99ad}.verify-form{display:flex;gap:9px}.otp-input{width:100%;min-width:0;background:white;border:1px solid #dbe3f1;padding:11px 12px;border-radius:10px;font-size:19px;font-family:ui-monospace,Consolas,monospace;font-weight:800;letter-spacing:4px;text-align:center;color:var(--ink)}.result{font-size:12px;line-height:1.7;margin-top:12px;padding:9px 11px;border-radius:9px;font-weight:650}.result.ok{color:#0d8060;background:#e7f8f1}.result.warn{color:#98620c;background:#fff4dc}.result.bad{color:#b93342;background:#feebed}
+.lower{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:19px}.lesson-panel{padding:22px}.lesson-heading{display:flex;gap:13px;align-items:flex-start;margin-bottom:16px}.lesson-icon{width:38px;height:38px;display:grid;place-items:center;border-radius:12px;background:#eaf5fb;color:#1c8cad;font-size:20px;flex-shrink:0}.lesson-heading h2{margin:0 0 7px;font-size:16px}.lesson-heading p{margin:0;font-size:12px;color:#8a97ad;line-height:1.65}.offline-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.step{display:flex;align-items:center;gap:10px;border:1px solid var(--border);border-radius:12px;padding:11px 12px;font-size:12px;line-height:1.5;cursor:pointer;transition:background .15s}.step input{accent-color:#249f79;width:17px;height:17px;flex-shrink:0;cursor:pointer}.step:has(input:checked){border-color:#c7e9db;background:#effaf5}.lesson-foot{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:14px;min-height:30px}.lesson-foot p{font-size:11px;color:#8b99ad;line-height:1.6;margin:0}.theory-btn{display:flex;justify-content:space-between;align-items:center;width:100%;text-align:left;background:#f5f8fd;border:1px solid #e8edf6;border-radius:12px;padding:15px;color:#2d446d;font-weight:800;font-size:13px}.theory-btn:hover{background:#edf3fd}.theory-btn .chevron{transition:transform .2s;font-size:17px}.theory-btn[aria-expanded=true] .chevron{transform:rotate(180deg)}.theory-content{margin-top:15px}.formula{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.formula-box{background:#f8faff;border:1px solid var(--border);padding:11px;border-radius:10px;min-width:0}.formula-box small{font-weight:700;color:#8391a8;font-size:10px;display:block}.formula-box strong{font-family:ui-monospace,Consolas,monospace;display:block;margin-top:6px;overflow-wrap:anywhere;font-size:13px;color:#2b4c83}.equation{margin-top:11px;line-height:2;text-align:center;background:#f0f6ff;color:#2553a3;border-radius:9px;padding:10px 6px;font-size:11px;font-weight:800}.hint-note{font-size:11px;color:#71839e;line-height:1.8;margin:11px 0}.selftest{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:13px}.selftest span{font-size:11px;color:#8392a9}.footer{font-size:11px;color:#8c98aa;display:flex;justify-content:space-between;gap:12px;margin-top:22px;line-height:1.7}.small-badge{background:#eef4ff;border-radius:999px;color:#4d6fa8;padding:5px 9px;font-size:10px;font-weight:800}
+.toast{position:fixed;right:22px;bottom:23px;z-index:1000;background:#152540;color:#fff;border-radius:12px;padding:13px 18px;max-width:min(400px,90vw);font-size:13px;line-height:1.5;box-shadow:0 12px 35px #142a3e35;animation:toastup .2s ease-out}.toast.error{background:#a92d40}@keyframes toastup{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.overlay{position:fixed;inset:0;z-index:900;display:grid;place-items:center;background:#091831b3;padding:15px}.dialog{background:#fff;border-radius:18px;max-width:440px;width:100%;box-shadow:0 25px 80px #05132a77;padding:25px}.dialog h2{margin:0 0 8px;font-size:20px}.dialog p{margin:0 0 22px;color:#75869f;font-size:13px;line-height:1.75}.dialog label{display:block;font-size:12px;font-weight:750;margin-bottom:9px}.dialog input{border:1px solid #d7e0ef;width:100%;border-radius:11px;padding:13px;margin-bottom:10px}.dialog .error-text{color:#c93647;font-size:12px;min-height:20px}.dialog-actions{display:flex;justify-content:flex-end;gap:9px;margin-top:15px}.danger-msg{background:#fff5e6;padding:12px;border-radius:9px;font-size:12px;color:#8d6017;margin:12px 0;line-height:1.6}
+body.presentation .mastintro,body.presentation .notice,body.presentation .accounts-panel,body.presentation .lower,body.presentation .footer{display:none}body.presentation .shell{max-width:1600px;padding:0 28px 26px}body.presentation .content{padding-top:22px}body.presentation .main-grid{grid-template-columns:minmax(350px,1fr) minmax(440px,1.1fr)}body.presentation .setup-panel .qr-frame svg{width:min(35vw,440px)}body.presentation .qr-area{min-height:390px}body.presentation .selected-account{font-size:26px}body.presentation .otp-digits{font-size:clamp(60px,7.5vw,118px)}body.presentation .token-label{font-size:17px}body.presentation .ring{width:112px;height:112px;padding:10px}body.presentation .ring-inner{font-size:40px}body.presentation .timer-copy{font-size:18px}body.presentation .timer-copy b{font-size:22px}body.presentation .verify{display:none}body.presentation .panel-head{padding-top:25px}
+@media(max-width:1170px){.shell{padding-left:20px;padding-right:20px}.main-grid{grid-template-columns:250px minmax(270px,1fr)}.otp-panel{grid-column:2}.setup-panel{grid-column:2;grid-row:1}.accounts-panel{grid-column:1;grid-row:1/span 2}.otp-panel .otp-hero{padding-top:10px}.otp-digits{font-size:57px}.lower{grid-template-columns:1fr 1fr}.hero-pills{display:none}}
+@media(max-width:740px){.shell{padding-left:14px;padding-right:14px}.topbar{padding:17px 0}.brand{gap:10px}.logo{width:40px;height:40px;border-radius:11px}.brand strong{font-size:16px}.brand span{font-size:10px}.top-actions .tag{display:none}.top-actions .btn{padding:9px 10px;font-size:11px}.mastintro{padding-bottom:24px}.mastintro h1{font-size:24px}.mastintro p{font-size:12px}.main-grid{display:flex;flex-direction:column;gap:13px}.accounts-panel{min-height:0}.accounts-panel .list-body{max-height:225px;overflow:auto}.action-icons button{opacity:1}.panel-head{padding:18px 16px 13px}.setup-panel{order:2}.accounts-panel{order:1}.otp-panel{order:3}.qr-area{min-height:248px}.qr-frame svg{width:min(235px,60vw)}.otp-digits{font-size:clamp(38px,9.7vw,60px);letter-spacing:1px}.otp-hero{padding-bottom:22px}.lower{grid-template-columns:1fr;gap:13px;margin-top:13px}.lesson-panel{padding:18px}.offline-list{grid-template-columns:1fr}.footer{flex-wrap:wrap}.notice{font-size:11px}.dialog{padding:21px}body.presentation .main-grid{display:flex;flex-direction:column}body.presentation .setup-panel .qr-frame svg{width:min(70vw,360px)}body.presentation .otp-digits{font-size:clamp(42px,10vw,72px)}body.presentation .qr-area{min-height:290px}body.presentation .ring{width:78px;height:78px}body.presentation .ring-inner{font-size:25px}body.presentation .topbar{padding:14px 0}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.001ms!important;transition-duration:.001ms!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<header class="mast"><div class="shell">
+  <div class="topbar">
+    <div class="brand"><div class="logo" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="11" rx="3"/><path d="M8 10V7a4 4 0 0 1 8 0v3M9 16h6"/></svg></div><div><strong>TOTP Classroom Lab</strong><span>SOFT TOKEN · 互動教學實驗室</span></div></div>
+    <div class="top-actions"><span class="tag">RFC 6238 · 真實計算</span><button id="presentBtn" class="btn ghost sm" type="button">⛶ 投影模式</button></div>
+  </div>
+  <div class="mastintro"><div><h1>同一把 Secret Key，<br>就算離線都能產生相同密碼。</h1><p>建立示範帳號 → 用 Authenticator 掃描 QR Code → 比較每 30 秒更新的 OTP → 開啟飛行模式，驗證原理。</p></div><div class="hero-pills"><span class="hero-pill">SHARED SECRET</span><span class="hero-pill">+ TIME</span><span class="hero-pill">= TOTP</span></div></div>
+</div></header>
+<main class="shell content">
+  <div class="notice"><span style="font-size:21px" aria-hidden="true">⚠</span><span><b>只供教學示範：</b>QR Code 內含 Secret Key，掃描者都可以產生相同 OTP。請只使用虛構帳號，不要輸入真實服務的 Secret Key；本機 LocalStorage 並不提供加密保護。<span id="storageWarn" hidden><b> 注意：此瀏覽器不能儲存帳號，重新整理後資料可能遺失。</b></span></span></div>
+  <div class="main-grid">
+    <section class="panel accounts-panel" aria-label="帳號管理">
+      <div class="panel-head"><div><span class="eyebrow">STEP 01</span><h2 class="panel-title">示範帳號</h2></div><button id="addBtn" class="btn primary sm" type="button"><span class="btn-icon">＋</span> 新增</button></div>
+      <div class="list-body" id="accountList"></div>
+      <div class="accounts-foot"><div class="account-count"><span>本機示範帳號</span><b id="accountCount">0 個</b></div><button id="clearAllBtn" class="btn sm wide" type="button">清除全部帳號</button></div>
+    </section>
+    <section class="panel setup-panel" aria-label="QR Code 配對">
+      <div class="panel-head"><div><span class="eyebrow">STEP 02</span><h2 class="panel-title">掃描 QR Code</h2></div><span class="small-badge">Authenticator</span></div>
+      <div id="selectedName" class="selected-account">—</div><div class="issuer">TOTP Classroom Lab</div>
+      <div class="qr-area"><div id="qrFrame" class="qr-frame" aria-live="polite"><span class="muted">正在建立 QR Code…</span></div><div id="qrHidden" class="qr-hidden hidden"><span>▦</span><strong>QR Code 已隱藏</strong><small>按「顯示 QR」即可恢復</small></div></div>
+      <p class="scan-help">學生用 Google Authenticator 或其他支援 TOTP 的應用程式掃描。掃描後即使離線亦可產生 OTP。</p>
+      <div class="setup-buttons"><button id="toggleQrBtn" class="btn sm" type="button">隱藏 QR</button><button id="manualBtn" class="btn sm soft" type="button">手動設定 / Secret Key</button></div>
+      <div id="secretBox" class="secret-box hidden"><div class="secret-top"><div class="mini-label">Base32 Secret Key</div><div><button id="secretToggle" class="btn sm" type="button">顯示</button> <button id="copySecret" class="btn sm" type="button">複製</button></div></div><div id="secretValue" class="secret-value">•••• •••• •••• ••••</div><div class="secret-hint">設定方式：選擇「輸入設定金鑰」，帳號名稱使用上方顯示的名稱，類型選擇「根據時間」。Secret Key 請勿用於正式帳號。</div></div>
+    </section>
+    <section class="panel otp-panel" aria-label="實時 OTP">
+      <div class="panel-head"><div><span class="eyebrow">STEP 03</span><h2 class="panel-title">實時一次性密碼</h2></div><span class="live-dot">LIVE · 30s</span></div>
+      <div class="otp-hero">
+        <div class="token-label">CURRENT ONE-TIME PASSWORD</div>
+        <div id="otpDigits" class="otp-digits" aria-live="off">——— ———</div>
+        <div class="token-desc">6 位數 · HMAC-SHA1 · 每 30 秒更新</div>
+        <div class="timer-row"><div id="countRing" class="ring"><div class="ring-inner"><span id="remaining">30</span><small>SECONDS</small></div></div><div class="timer-copy"><b>距離下一組密碼</b><small>與手機使用相同的時間區間</small><small id="localClock">本機時間：—</small></div></div>
+      </div>
+      <div class="verify"><h3>🔎 驗證學生手機的 OTP</h3><p>讓學生輸入 Authenticator 顯示的 6 位數，體驗真正的 TOTP 驗證。</p><form id="verifyForm" class="verify-form" autocomplete="off"><input class="otp-input" id="verifyInput" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" placeholder="000000" aria-label="請輸入6位數 OTP" autocomplete="one-time-code"><button class="btn primary" id="verifyBtn" type="submit">驗證</button></form><div id="verifyResult" class="result hidden" aria-live="polite"></div></div>
+    </section>
+  </div>
+  <div class="lower">
+    <section class="panel lesson-panel"><div class="lesson-heading"><div class="lesson-icon">✈</div><div><h2>離線實驗 · Offline Challenge</h2><p>手機真的不需要網絡嗎？跟著步驟一起驗證。</p></div></div><div class="offline-list" id="offlineSteps"><label class="step"><input type="checkbox">① 手機掃描 QR Code 加入帳號</label><label class="step"><input type="checkbox">② 先比較手機與網頁的 OTP</label><label class="step"><input type="checkbox">③ 開飛行模式，確認 Wi-Fi 已關閉</label><label class="step"><input type="checkbox">④ 等候更新，再比較兩邊的 OTP</label></div><div class="lesson-foot"><p id="offlineStatus">已完成 0 / 4 個步驟</p><button id="resetExperiment" class="btn sm" type="button">重新開始</button></div><div id="offlineConclusion" class="result ok hidden">🎉 實驗完成！手機與網頁沒有互相傳送 OTP；兩邊使用相同 Secret Key 和時間規則，各自獨立計算結果。注意裝置時間須準確。</div></section>
+    <section class="panel lesson-panel"><div class="lesson-heading"><div class="lesson-icon">⚙</div><div><h2>原理拆解 · How It Works</h2><p>可以先收起，講解時再展開，減少學生負擔。</p></div></div><button id="theoryToggle" class="theory-btn" type="button" aria-expanded="false" aria-controls="theoryContent"><span>查看 Secret Key + Time 如何變成 OTP</span><span class="chevron">⌄</span></button>
+      <div id="theoryContent" class="theory-content hidden"><div class="formula"><div class="formula-box"><small>Unix Time · 秒</small><strong id="unixTime">—</strong></div><div class="formula-box"><small>Time Counter = floor(time / 30)</small><strong id="counterVal">—</strong></div><div class="formula-box"><small>演算法</small><strong>HMAC-SHA1</strong></div><div class="formula-box"><small>截取結果 mod 1,000,000</small><strong id="resultVal">—</strong></div></div><div class="equation">Secret Key + Time Counter → HMAC-SHA1 → 動態截取 → 六位數 OTP</div><p class="hint-note">兩個裝置的時間不需要互聯同步，只要系統時鐘足夠準確、Secret Key 一致，就能得到相同結果。時區不影響 Unix Time；時鐘偏差會影響 OTP。</p><div class="selftest"><button id="selfTestBtn" type="button" class="btn sm soft">執行 RFC 6238 自我測試</button><span id="selfTestResult" aria-live="polite">使用官方 SHA-1 測試向量</span></div></div>
+    </section>
+  </div>
+  <footer class="footer"><span>TOTP Classroom Lab · V1 · 教學用，並非正式身份驗證平台</span><span>使用本機瀏覽器計算 · 不連接伺服器 · 沒有上傳 Secret Key</span></footer>
+</main>
+<div id="toast" class="toast hidden" role="status"></div>
+<div id="modalOverlay" class="overlay hidden" role="presentation"><div class="dialog" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><h2 id="modalTitle">新增帳號</h2><p id="modalDescription">為這個帳號產生一組全新 Secret Key。</p><form id="accountForm"><div id="nameField"><label for="accountNameInput">帳號名稱</label><input id="accountNameInput" type="text" autocomplete="off" maxlength="32" placeholder="例如：Student01"></div><div id="dangerMsg" class="danger-msg hidden"></div><div id="modalError" class="error-text" aria-live="polite"></div><div class="dialog-actions"><button id="cancelModalBtn" class="btn" type="button">取消</button><button id="confirmModalBtn" class="btn primary" type="submit">建立帳號</button></div></form></div></div>
+<!-- Embedded QRCode generator (Kazuhiko Arase; MIT) below. Bundled locally so no CDN/API requests are made. -->
+<script>
+/* QR generator library: Copyright (c) 2009 Kazuhiko Arase, MIT licensed. Original code adapted by qrcode-terminal for CommonJS. */
+const QRCodeEngine = (() => {
+const mods = Object.create(null), cache = Object.create(null);
+function libRequire(name){ const key=name.startsWith("./")?name.slice(2):name; if(cache[key])return cache[key].exports; if(!mods[key])throw new Error("QR module not found: "+name);const module={exports:{}};cache[key]=module;mods[key](libRequire,module,module.exports);return module.exports;}
+mods['QR8bitByte'] = function(require,module,exports){
+var QRMode = require('./QRMode');
+
+function QR8bitByte(data) {
+	this.mode = QRMode.MODE_8BIT_BYTE;
+	this.data = data;
+}
+
+QR8bitByte.prototype = {
+
+	getLength : function() {
+		return this.data.length;
+	},
+	
+	write : function(buffer) {
+		for (var i = 0; i < this.data.length; i++) {
+			// not JIS ...
+			buffer.put(this.data.charCodeAt(i), 8);
+		}
+	}
+};
+
+module.exports = QR8bitByte;
+
+};
+mods['QRBitBuffer'] = function(require,module,exports){
+function QRBitBuffer() {
+	this.buffer = [];
+	this.length = 0;
+}
+
+QRBitBuffer.prototype = {
+
+	get : function(index) {
+		var bufIndex = Math.floor(index / 8);
+		return ( (this.buffer[bufIndex] >>> (7 - index % 8) ) & 1) == 1;
+	},
+	
+	put : function(num, length) {
+		for (var i = 0; i < length; i++) {
+			this.putBit( ( (num >>> (length - i - 1) ) & 1) == 1);
+		}
+	},
+	
+	getLengthInBits : function() {
+		return this.length;
+	},
+	
+	putBit : function(bit) {
+	
+		var bufIndex = Math.floor(this.length / 8);
+		if (this.buffer.length <= bufIndex) {
+			this.buffer.push(0);
+		}
+	
+		if (bit) {
+			this.buffer[bufIndex] |= (0x80 >>> (this.length % 8) );
+		}
+	
+		this.length++;
+	}
+};
+
+module.exports = QRBitBuffer;
+
+};
+mods['QRErrorCorrectLevel'] = function(require,module,exports){
+module.exports = {
+	L : 1,
+	M : 0,
+	Q : 3,
+	H : 2
+};
+
+
+};
+mods['QRMaskPattern'] = function(require,module,exports){
+module.exports = {
+	PATTERN000 : 0,
+	PATTERN001 : 1,
+	PATTERN010 : 2,
+	PATTERN011 : 3,
+	PATTERN100 : 4,
+	PATTERN101 : 5,
+	PATTERN110 : 6,
+	PATTERN111 : 7
+};
+
+};
+mods['QRMath'] = function(require,module,exports){
+var QRMath = {
+
+	glog : function(n) {
+	
+		if (n < 1) {
+			throw new Error("glog(" + n + ")");
+		}
+		
+		return QRMath.LOG_TABLE[n];
+	},
+	
+	gexp : function(n) {
+	
+		while (n < 0) {
+			n += 255;
+		}
+	
+		while (n >= 256) {
+			n -= 255;
+		}
+	
+		return QRMath.EXP_TABLE[n];
+	},
+	
+	EXP_TABLE : new Array(256),
+	
+	LOG_TABLE : new Array(256)
+
+};
+	
+for (var i = 0; i < 8; i++) {
+	QRMath.EXP_TABLE[i] = 1 << i;
+}
+for (var i = 8; i < 256; i++) {
+	QRMath.EXP_TABLE[i] = QRMath.EXP_TABLE[i - 4]
+		^ QRMath.EXP_TABLE[i - 5]
+		^ QRMath.EXP_TABLE[i - 6]
+		^ QRMath.EXP_TABLE[i - 8];
+}
+for (var i = 0; i < 255; i++) {
+	QRMath.LOG_TABLE[QRMath.EXP_TABLE[i] ] = i;
+}
+
+module.exports = QRMath;
+
+};
+mods['QRMode'] = function(require,module,exports){
+module.exports = {
+    MODE_NUMBER :       1 << 0,
+    MODE_ALPHA_NUM :    1 << 1,
+    MODE_8BIT_BYTE :    1 << 2,
+    MODE_KANJI :        1 << 3
+};
+
+};
+mods['QRPolynomial'] = function(require,module,exports){
+var QRMath = require('./QRMath');
+
+function QRPolynomial(num, shift) {
+	if (num.length === undefined) {
+		throw new Error(num.length + "/" + shift);
+	}
+
+	var offset = 0;
+
+	while (offset < num.length && num[offset] === 0) {
+		offset++;
+	}
+
+	this.num = new Array(num.length - offset + shift);
+	for (var i = 0; i < num.length - offset; i++) {
+		this.num[i] = num[i + offset];
+	}
+}
+
+QRPolynomial.prototype = {
+
+	get : function(index) {
+		return this.num[index];
+	},
+	
+	getLength : function() {
+		return this.num.length;
+	},
+	
+	multiply : function(e) {
+	
+		var num = new Array(this.getLength() + e.getLength() - 1);
+	
+		for (var i = 0; i < this.getLength(); i++) {
+			for (var j = 0; j < e.getLength(); j++) {
+				num[i + j] ^= QRMath.gexp(QRMath.glog(this.get(i) ) + QRMath.glog(e.get(j) ) );
+			}
+		}
+	
+		return new QRPolynomial(num, 0);
+	},
+	
+	mod : function(e) {
+	
+		if (this.getLength() - e.getLength() < 0) {
+			return this;
+		}
+	
+		var ratio = QRMath.glog(this.get(0) ) - QRMath.glog(e.get(0) );
+	
+		var num = new Array(this.getLength() );
+		
+		for (var i = 0; i < this.getLength(); i++) {
+			num[i] = this.get(i);
+		}
+		
+		for (var x = 0; x < e.getLength(); x++) {
+			num[x] ^= QRMath.gexp(QRMath.glog(e.get(x) ) + ratio);
+		}
+	
+		// recursive call
+		return new QRPolynomial(num, 0).mod(e);
+	}
+};
+
+module.exports = QRPolynomial;
+
+};
+mods['QRRSBlock'] = function(require,module,exports){
+var QRErrorCorrectLevel = require('./QRErrorCorrectLevel');
+
+function QRRSBlock(totalCount, dataCount) {
+	this.totalCount = totalCount;
+	this.dataCount  = dataCount;
+}
+
+QRRSBlock.RS_BLOCK_TABLE = [
+
+	// L
+	// M
+	// Q
+	// H
+
+	// 1
+	[1, 26, 19],
+	[1, 26, 16],
+	[1, 26, 13],
+	[1, 26, 9],
+	
+	// 2
+	[1, 44, 34],
+	[1, 44, 28],
+	[1, 44, 22],
+	[1, 44, 16],
+
+	// 3
+	[1, 70, 55],
+	[1, 70, 44],
+	[2, 35, 17],
+	[2, 35, 13],
+
+	// 4		
+	[1, 100, 80],
+	[2, 50, 32],
+	[2, 50, 24],
+	[4, 25, 9],
+	
+	// 5
+	[1, 134, 108],
+	[2, 67, 43],
+	[2, 33, 15, 2, 34, 16],
+	[2, 33, 11, 2, 34, 12],
+	
+	// 6
+	[2, 86, 68],
+	[4, 43, 27],
+	[4, 43, 19],
+	[4, 43, 15],
+	
+	// 7		
+	[2, 98, 78],
+	[4, 49, 31],
+	[2, 32, 14, 4, 33, 15],
+	[4, 39, 13, 1, 40, 14],
+	
+	// 8
+	[2, 121, 97],
+	[2, 60, 38, 2, 61, 39],
+	[4, 40, 18, 2, 41, 19],
+	[4, 40, 14, 2, 41, 15],
+	
+	// 9
+	[2, 146, 116],
+	[3, 58, 36, 2, 59, 37],
+	[4, 36, 16, 4, 37, 17],
+	[4, 36, 12, 4, 37, 13],
+	
+	// 10		
+	[2, 86, 68, 2, 87, 69],
+	[4, 69, 43, 1, 70, 44],
+	[6, 43, 19, 2, 44, 20],
+	[6, 43, 15, 2, 44, 16],
+
+	// 11
+	[4, 101, 81],
+	[1, 80, 50, 4, 81, 51],
+	[4, 50, 22, 4, 51, 23],
+	[3, 36, 12, 8, 37, 13],
+
+	// 12
+	[2, 116, 92, 2, 117, 93],
+	[6, 58, 36, 2, 59, 37],
+	[4, 46, 20, 6, 47, 21],
+	[7, 42, 14, 4, 43, 15],
+
+	// 13
+	[4, 133, 107],
+	[8, 59, 37, 1, 60, 38],
+	[8, 44, 20, 4, 45, 21],
+	[12, 33, 11, 4, 34, 12],
+
+	// 14
+	[3, 145, 115, 1, 146, 116],
+	[4, 64, 40, 5, 65, 41],
+	[11, 36, 16, 5, 37, 17],
+	[11, 36, 12, 5, 37, 13],
+
+	// 15
+	[5, 109, 87, 1, 110, 88],
+	[5, 65, 41, 5, 66, 42],
+	[5, 54, 24, 7, 55, 25],
+	[11, 36, 12],
+
+	// 16
+	[5, 122, 98, 1, 123, 99],
+	[7, 73, 45, 3, 74, 46],
+	[15, 43, 19, 2, 44, 20],
+	[3, 45, 15, 13, 46, 16],
+
+	// 17
+	[1, 135, 107, 5, 136, 108],
+	[10, 74, 46, 1, 75, 47],
+	[1, 50, 22, 15, 51, 23],
+	[2, 42, 14, 17, 43, 15],
+
+	// 18
+	[5, 150, 120, 1, 151, 121],
+	[9, 69, 43, 4, 70, 44],
+	[17, 50, 22, 1, 51, 23],
+	[2, 42, 14, 19, 43, 15],
+
+	// 19
+	[3, 141, 113, 4, 142, 114],
+	[3, 70, 44, 11, 71, 45],
+	[17, 47, 21, 4, 48, 22],
+	[9, 39, 13, 16, 40, 14],
+
+	// 20
+	[3, 135, 107, 5, 136, 108],
+	[3, 67, 41, 13, 68, 42],
+	[15, 54, 24, 5, 55, 25],
+	[15, 43, 15, 10, 44, 16],
+
+	// 21
+	[4, 144, 116, 4, 145, 117],
+	[17, 68, 42],
+	[17, 50, 22, 6, 51, 23],
+	[19, 46, 16, 6, 47, 17],
+
+	// 22
+	[2, 139, 111, 7, 140, 112],
+	[17, 74, 46],
+	[7, 54, 24, 16, 55, 25],
+	[34, 37, 13],
+
+	// 23
+	[4, 151, 121, 5, 152, 122],
+	[4, 75, 47, 14, 76, 48],
+	[11, 54, 24, 14, 55, 25],
+	[16, 45, 15, 14, 46, 16],
+
+	// 24
+	[6, 147, 117, 4, 148, 118],
+	[6, 73, 45, 14, 74, 46],
+	[11, 54, 24, 16, 55, 25],
+	[30, 46, 16, 2, 47, 17],
+
+	// 25
+	[8, 132, 106, 4, 133, 107],
+	[8, 75, 47, 13, 76, 48],
+	[7, 54, 24, 22, 55, 25],
+	[22, 45, 15, 13, 46, 16],
+
+	// 26
+	[10, 142, 114, 2, 143, 115],
+	[19, 74, 46, 4, 75, 47],
+	[28, 50, 22, 6, 51, 23],
+	[33, 46, 16, 4, 47, 17],
+
+	// 27
+	[8, 152, 122, 4, 153, 123],
+	[22, 73, 45, 3, 74, 46],
+	[8, 53, 23, 26, 54, 24],
+	[12, 45, 15, 28, 46, 16],
+
+	// 28
+	[3, 147, 117, 10, 148, 118],
+	[3, 73, 45, 23, 74, 46],
+	[4, 54, 24, 31, 55, 25],
+	[11, 45, 15, 31, 46, 16],
+
+	// 29
+	[7, 146, 116, 7, 147, 117],
+	[21, 73, 45, 7, 74, 46],
+	[1, 53, 23, 37, 54, 24],
+	[19, 45, 15, 26, 46, 16],
+
+	// 30
+	[5, 145, 115, 10, 146, 116],
+	[19, 75, 47, 10, 76, 48],
+	[15, 54, 24, 25, 55, 25],
+	[23, 45, 15, 25, 46, 16],
+
+	// 31
+	[13, 145, 115, 3, 146, 116],
+	[2, 74, 46, 29, 75, 47],
+	[42, 54, 24, 1, 55, 25],
+	[23, 45, 15, 28, 46, 16],
+
+	// 32
+	[17, 145, 115],
+	[10, 74, 46, 23, 75, 47],
+	[10, 54, 24, 35, 55, 25],
+	[19, 45, 15, 35, 46, 16],
+
+	// 33
+	[17, 145, 115, 1, 146, 116],
+	[14, 74, 46, 21, 75, 47],
+	[29, 54, 24, 19, 55, 25],
+	[11, 45, 15, 46, 46, 16],
+
+	// 34
+	[13, 145, 115, 6, 146, 116],
+	[14, 74, 46, 23, 75, 47],
+	[44, 54, 24, 7, 55, 25],
+	[59, 46, 16, 1, 47, 17],
+
+	// 35
+	[12, 151, 121, 7, 152, 122],
+	[12, 75, 47, 26, 76, 48],
+	[39, 54, 24, 14, 55, 25],
+	[22, 45, 15, 41, 46, 16],
+
+	// 36
+	[6, 151, 121, 14, 152, 122],
+	[6, 75, 47, 34, 76, 48],
+	[46, 54, 24, 10, 55, 25],
+	[2, 45, 15, 64, 46, 16],
+
+	// 37
+	[17, 152, 122, 4, 153, 123],
+	[29, 74, 46, 14, 75, 47],
+	[49, 54, 24, 10, 55, 25],
+	[24, 45, 15, 46, 46, 16],
+
+	// 38
+	[4, 152, 122, 18, 153, 123],
+	[13, 74, 46, 32, 75, 47],
+	[48, 54, 24, 14, 55, 25],
+	[42, 45, 15, 32, 46, 16],
+
+	// 39
+	[20, 147, 117, 4, 148, 118],
+	[40, 75, 47, 7, 76, 48],
+	[43, 54, 24, 22, 55, 25],
+	[10, 45, 15, 67, 46, 16],
+
+	// 40
+	[19, 148, 118, 6, 149, 119],
+	[18, 75, 47, 31, 76, 48],
+	[34, 54, 24, 34, 55, 25],
+	[20, 45, 15, 61, 46, 16]
+];
+
+QRRSBlock.getRSBlocks = function(typeNumber, errorCorrectLevel) {
+	
+	var rsBlock = QRRSBlock.getRsBlockTable(typeNumber, errorCorrectLevel);
+	
+	if (rsBlock === undefined) {
+		throw new Error("bad rs block @ typeNumber:" + typeNumber + "/errorCorrectLevel:" + errorCorrectLevel);
+	}
+
+	var length = rsBlock.length / 3;
+	
+	var list = [];
+	
+	for (var i = 0; i < length; i++) {
+
+		var count = rsBlock[i * 3 + 0];
+		var totalCount = rsBlock[i * 3 + 1];
+		var dataCount  = rsBlock[i * 3 + 2];
+
+		for (var j = 0; j < count; j++) {
+			list.push(new QRRSBlock(totalCount, dataCount) );	
+		}
+	}
+	
+	return list;
+};
+
+QRRSBlock.getRsBlockTable = function(typeNumber, errorCorrectLevel) {
+
+	switch(errorCorrectLevel) {
+	case QRErrorCorrectLevel.L :
+		return QRRSBlock.RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 0];
+	case QRErrorCorrectLevel.M :
+		return QRRSBlock.RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 1];
+	case QRErrorCorrectLevel.Q :
+		return QRRSBlock.RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 2];
+	case QRErrorCorrectLevel.H :
+		return QRRSBlock.RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 3];
+	default :
+		return undefined;
+	}
+};
+
+module.exports = QRRSBlock;
+
+};
+mods['QRUtil'] = function(require,module,exports){
+var QRMode = require('./QRMode');
+var QRPolynomial = require('./QRPolynomial');
+var QRMath = require('./QRMath');
+var QRMaskPattern = require('./QRMaskPattern');
+
+var QRUtil = {
+
+    PATTERN_POSITION_TABLE : [
+        [],
+        [6, 18],
+        [6, 22],
+        [6, 26],
+        [6, 30],
+        [6, 34],
+        [6, 22, 38],
+        [6, 24, 42],
+        [6, 26, 46],
+        [6, 28, 50],
+        [6, 30, 54],        
+        [6, 32, 58],
+        [6, 34, 62],
+        [6, 26, 46, 66],
+        [6, 26, 48, 70],
+        [6, 26, 50, 74],
+        [6, 30, 54, 78],
+        [6, 30, 56, 82],
+        [6, 30, 58, 86],
+        [6, 34, 62, 90],
+        [6, 28, 50, 72, 94],
+        [6, 26, 50, 74, 98],
+        [6, 30, 54, 78, 102],
+        [6, 28, 54, 80, 106],
+        [6, 32, 58, 84, 110],
+        [6, 30, 58, 86, 114],
+        [6, 34, 62, 90, 118],
+        [6, 26, 50, 74, 98, 122],
+        [6, 30, 54, 78, 102, 126],
+        [6, 26, 52, 78, 104, 130],
+        [6, 30, 56, 82, 108, 134],
+        [6, 34, 60, 86, 112, 138],
+        [6, 30, 58, 86, 114, 142],
+        [6, 34, 62, 90, 118, 146],
+        [6, 30, 54, 78, 102, 126, 150],
+        [6, 24, 50, 76, 102, 128, 154],
+        [6, 28, 54, 80, 106, 132, 158],
+        [6, 32, 58, 84, 110, 136, 162],
+        [6, 26, 54, 82, 110, 138, 166],
+        [6, 30, 58, 86, 114, 142, 170]
+    ],
+
+    G15 : (1 << 10) | (1 << 8) | (1 << 5) | (1 << 4) | (1 << 2) | (1 << 1) | (1 << 0),
+    G18 : (1 << 12) | (1 << 11) | (1 << 10) | (1 << 9) | (1 << 8) | (1 << 5) | (1 << 2) | (1 << 0),
+    G15_MASK : (1 << 14) | (1 << 12) | (1 << 10)    | (1 << 4) | (1 << 1),
+
+    getBCHTypeInfo : function(data) {
+        var d = data << 10;
+        while (QRUtil.getBCHDigit(d) - QRUtil.getBCHDigit(QRUtil.G15) >= 0) {
+            d ^= (QRUtil.G15 << (QRUtil.getBCHDigit(d) - QRUtil.getBCHDigit(QRUtil.G15) ) );    
+        }
+        return ( (data << 10) | d) ^ QRUtil.G15_MASK;
+    },
+
+    getBCHTypeNumber : function(data) {
+        var d = data << 12;
+        while (QRUtil.getBCHDigit(d) - QRUtil.getBCHDigit(QRUtil.G18) >= 0) {
+            d ^= (QRUtil.G18 << (QRUtil.getBCHDigit(d) - QRUtil.getBCHDigit(QRUtil.G18) ) );    
+        }
+        return (data << 12) | d;
+    },
+
+    getBCHDigit : function(data) {
+
+        var digit = 0;
+
+        while (data !== 0) {
+            digit++;
+            data >>>= 1;
+        }
+
+        return digit;
+    },
+
+    getPatternPosition : function(typeNumber) {
+        return QRUtil.PATTERN_POSITION_TABLE[typeNumber - 1];
+    },
+
+    getMask : function(maskPattern, i, j) {
+        
+        switch (maskPattern) {
+            
+        case QRMaskPattern.PATTERN000 : return (i + j) % 2 === 0;
+        case QRMaskPattern.PATTERN001 : return i % 2 === 0;
+        case QRMaskPattern.PATTERN010 : return j % 3 === 0;
+        case QRMaskPattern.PATTERN011 : return (i + j) % 3 === 0;
+        case QRMaskPattern.PATTERN100 : return (Math.floor(i / 2) + Math.floor(j / 3) ) % 2 === 0;
+        case QRMaskPattern.PATTERN101 : return (i * j) % 2 + (i * j) % 3 === 0;
+        case QRMaskPattern.PATTERN110 : return ( (i * j) % 2 + (i * j) % 3) % 2 === 0;
+        case QRMaskPattern.PATTERN111 : return ( (i * j) % 3 + (i + j) % 2) % 2 === 0;
+
+        default :
+            throw new Error("bad maskPattern:" + maskPattern);
+        }
+    },
+
+    getErrorCorrectPolynomial : function(errorCorrectLength) {
+
+        var a = new QRPolynomial([1], 0);
+
+        for (var i = 0; i < errorCorrectLength; i++) {
+            a = a.multiply(new QRPolynomial([1, QRMath.gexp(i)], 0) );
+        }
+
+        return a;
+    },
+
+    getLengthInBits : function(mode, type) {
+
+        if (1 <= type && type < 10) {
+
+            // 1 - 9
+
+            switch(mode) {
+            case QRMode.MODE_NUMBER     : return 10;
+            case QRMode.MODE_ALPHA_NUM  : return 9;
+            case QRMode.MODE_8BIT_BYTE  : return 8;
+            case QRMode.MODE_KANJI      : return 8;
+            default :
+                throw new Error("mode:" + mode);
+            }
+
+        } else if (type < 27) {
+
+            // 10 - 26
+
+            switch(mode) {
+            case QRMode.MODE_NUMBER     : return 12;
+            case QRMode.MODE_ALPHA_NUM  : return 11;
+            case QRMode.MODE_8BIT_BYTE  : return 16;
+            case QRMode.MODE_KANJI      : return 10;
+            default :
+                throw new Error("mode:" + mode);
+            }
+
+        } else if (type < 41) {
+
+            // 27 - 40
+
+            switch(mode) {
+            case QRMode.MODE_NUMBER     : return 14;
+            case QRMode.MODE_ALPHA_NUM  : return 13;
+            case QRMode.MODE_8BIT_BYTE  : return 16;
+            case QRMode.MODE_KANJI      : return 12;
+            default :
+                throw new Error("mode:" + mode);
+            }
+
+        } else {
+            throw new Error("type:" + type);
+        }
+    },
+
+    getLostPoint : function(qrCode) {
+        
+        var moduleCount = qrCode.getModuleCount();
+        var lostPoint = 0;
+        var row = 0; 
+        var col = 0;
+
+        
+        // LEVEL1
+        
+        for (row = 0; row < moduleCount; row++) {
+
+            for (col = 0; col < moduleCount; col++) {
+
+                var sameCount = 0;
+                var dark = qrCode.isDark(row, col);
+
+                for (var r = -1; r <= 1; r++) {
+
+                    if (row + r < 0 || moduleCount <= row + r) {
+                        continue;
+                    }
+
+                    for (var c = -1; c <= 1; c++) {
+
+                        if (col + c < 0 || moduleCount <= col + c) {
+                            continue;
+                        }
+
+                        if (r === 0 && c === 0) {
+                            continue;
+                        }
+
+                        if (dark === qrCode.isDark(row + r, col + c) ) {
+                            sameCount++;
+                        }
+                    }
+                }
+
+                if (sameCount > 5) {
+                    lostPoint += (3 + sameCount - 5);
+                }
+            }
+        }
+
+        // LEVEL2
+
+        for (row = 0; row < moduleCount - 1; row++) {
+            for (col = 0; col < moduleCount - 1; col++) {
+                var count = 0;
+                if (qrCode.isDark(row,     col    ) ) count++;
+                if (qrCode.isDark(row + 1, col    ) ) count++;
+                if (qrCode.isDark(row,     col + 1) ) count++;
+                if (qrCode.isDark(row + 1, col + 1) ) count++;
+                if (count === 0 || count === 4) {
+                    lostPoint += 3;
+                }
+            }
+        }
+
+        // LEVEL3
+
+        for (row = 0; row < moduleCount; row++) {
+            for (col = 0; col < moduleCount - 6; col++) {
+                if (qrCode.isDark(row, col) && 
+                        !qrCode.isDark(row, col + 1) && 
+                         qrCode.isDark(row, col + 2) && 
+                         qrCode.isDark(row, col + 3) && 
+                         qrCode.isDark(row, col + 4) && 
+                        !qrCode.isDark(row, col + 5) && 
+                         qrCode.isDark(row, col + 6) ) {
+                    lostPoint += 40;
+                }
+            }
+        }
+
+        for (col = 0; col < moduleCount; col++) {
+            for (row = 0; row < moduleCount - 6; row++) {
+                if (qrCode.isDark(row, col) &&
+                        !qrCode.isDark(row + 1, col) &&
+                         qrCode.isDark(row + 2, col) &&
+                         qrCode.isDark(row + 3, col) &&
+                         qrCode.isDark(row + 4, col) &&
+                        !qrCode.isDark(row + 5, col) &&
+                         qrCode.isDark(row + 6, col) ) {
+                    lostPoint += 40;
+                }
+            }
+        }
+
+        // LEVEL4
+        
+        var darkCount = 0;
+
+        for (col = 0; col < moduleCount; col++) {
+            for (row = 0; row < moduleCount; row++) {
+                if (qrCode.isDark(row, col) ) {
+                    darkCount++;
+                }
+            }
+        }
+        
+        var ratio = Math.abs(100 * darkCount / moduleCount / moduleCount - 50) / 5;
+        lostPoint += ratio * 10;
+
+        return lostPoint;       
+    }
+
+};
+
+module.exports = QRUtil;
+
+};
+mods['index'] = function(require,module,exports){
+//---------------------------------------------------------------------
+// QRCode for JavaScript
+//
+// Copyright (c) 2009 Kazuhiko Arase
+//
+// URL: http://www.d-project.com/
+//
+// Licensed under the MIT license:
+//   http://www.opensource.org/licenses/mit-license.php
+//
+// The word "QR Code" is registered trademark of 
+// DENSO WAVE INCORPORATED
+//   http://www.denso-wave.com/qrcode/faqpatent-e.html
+//
+//---------------------------------------------------------------------
+// Modified to work in node for this project (and some refactoring)
+//---------------------------------------------------------------------
+
+var QR8bitByte = require('./QR8bitByte');
+var QRUtil = require('./QRUtil');
+var QRPolynomial = require('./QRPolynomial');
+var QRRSBlock = require('./QRRSBlock');
+var QRBitBuffer = require('./QRBitBuffer');
+
+function QRCode(typeNumber, errorCorrectLevel) {
+	this.typeNumber = typeNumber;
+	this.errorCorrectLevel = errorCorrectLevel;
+	this.modules = null;
+	this.moduleCount = 0;
+	this.dataCache = null;
+	this.dataList = [];
+}
+
+QRCode.prototype = {
+	
+	addData : function(data) {
+		var newData = new QR8bitByte(data);
+		this.dataList.push(newData);
+		this.dataCache = null;
+	},
+	
+	isDark : function(row, col) {
+		if (row < 0 || this.moduleCount <= row || col < 0 || this.moduleCount <= col) {
+			throw new Error(row + "," + col);
+		}
+		return this.modules[row][col];
+	},
+
+	getModuleCount : function() {
+		return this.moduleCount;
+	},
+	
+	make : function() {
+		// Calculate automatically typeNumber if provided is < 1
+		if (this.typeNumber < 1 ){
+			var typeNumber = 1;
+			for (typeNumber = 1; typeNumber < 40; typeNumber++) {
+				var rsBlocks = QRRSBlock.getRSBlocks(typeNumber, this.errorCorrectLevel);
+
+				var buffer = new QRBitBuffer();
+				var totalDataCount = 0;
+				for (var i = 0; i < rsBlocks.length; i++) {
+					totalDataCount += rsBlocks[i].dataCount;
+				}
+
+				for (var x = 0; x < this.dataList.length; x++) {
+					var data = this.dataList[x];
+					buffer.put(data.mode, 4);
+					buffer.put(data.getLength(), QRUtil.getLengthInBits(data.mode, typeNumber) );
+					data.write(buffer);
+				}
+				if (buffer.getLengthInBits() <= totalDataCount * 8)
+					break;
+			}
+			this.typeNumber = typeNumber;
+		}
+		this.makeImpl(false, this.getBestMaskPattern() );
+	},
+	
+	makeImpl : function(test, maskPattern) {
+		
+		this.moduleCount = this.typeNumber * 4 + 17;
+		this.modules = new Array(this.moduleCount);
+		
+		for (var row = 0; row < this.moduleCount; row++) {
+			
+			this.modules[row] = new Array(this.moduleCount);
+			
+			for (var col = 0; col < this.moduleCount; col++) {
+				this.modules[row][col] = null;//(col + row) % 3;
+			}
+		}
+	
+		this.setupPositionProbePattern(0, 0);
+		this.setupPositionProbePattern(this.moduleCount - 7, 0);
+		this.setupPositionProbePattern(0, this.moduleCount - 7);
+		this.setupPositionAdjustPattern();
+		this.setupTimingPattern();
+		this.setupTypeInfo(test, maskPattern);
+		
+		if (this.typeNumber >= 7) {
+			this.setupTypeNumber(test);
+		}
+	
+		if (this.dataCache === null) {
+			this.dataCache = QRCode.createData(this.typeNumber, this.errorCorrectLevel, this.dataList);
+		}
+	
+		this.mapData(this.dataCache, maskPattern);
+	},
+
+	setupPositionProbePattern : function(row, col)  {
+		
+		for (var r = -1; r <= 7; r++) {
+			
+			if (row + r <= -1 || this.moduleCount <= row + r) continue;
+			
+			for (var c = -1; c <= 7; c++) {
+				
+				if (col + c <= -1 || this.moduleCount <= col + c) continue;
+				
+				if ( (0 <= r && r <= 6 && (c === 0 || c === 6) ) || 
+                     (0 <= c && c <= 6 && (r === 0 || r === 6) ) || 
+                     (2 <= r && r <= 4 && 2 <= c && c <= 4) ) {
+					this.modules[row + r][col + c] = true;
+				} else {
+					this.modules[row + r][col + c] = false;
+				}
+			}		
+		}		
+	},
+	
+	getBestMaskPattern : function() {
+	
+		var minLostPoint = 0;
+		var pattern = 0;
+	
+		for (var i = 0; i < 8; i++) {
+			
+			this.makeImpl(true, i);
+	
+			var lostPoint = QRUtil.getLostPoint(this);
+	
+			if (i === 0 || minLostPoint >  lostPoint) {
+				minLostPoint = lostPoint;
+				pattern = i;
+			}
+		}
+	
+		return pattern;
+	},
+	
+	createMovieClip : function(target_mc, instance_name, depth) {
+	
+		var qr_mc = target_mc.createEmptyMovieClip(instance_name, depth);
+		var cs = 1;
+	
+		this.make();
+
+		for (var row = 0; row < this.modules.length; row++) {
+			
+			var y = row * cs;
+			
+			for (var col = 0; col < this.modules[row].length; col++) {
+	
+				var x = col * cs;
+				var dark = this.modules[row][col];
+			
+				if (dark) {
+					qr_mc.beginFill(0, 100);
+					qr_mc.moveTo(x, y);
+					qr_mc.lineTo(x + cs, y);
+					qr_mc.lineTo(x + cs, y + cs);
+					qr_mc.lineTo(x, y + cs);
+					qr_mc.endFill();
+				}
+			}
+		}
+		
+		return qr_mc;
+	},
+
+	setupTimingPattern : function() {
+		
+		for (var r = 8; r < this.moduleCount - 8; r++) {
+			if (this.modules[r][6] !== null) {
+				continue;
+			}
+			this.modules[r][6] = (r % 2 === 0);
+		}
+	
+		for (var c = 8; c < this.moduleCount - 8; c++) {
+			if (this.modules[6][c] !== null) {
+				continue;
+			}
+			this.modules[6][c] = (c % 2 === 0);
+		}
+	},
+	
+	setupPositionAdjustPattern : function() {
+	
+		var pos = QRUtil.getPatternPosition(this.typeNumber);
+		
+		for (var i = 0; i < pos.length; i++) {
+		
+			for (var j = 0; j < pos.length; j++) {
+			
+				var row = pos[i];
+				var col = pos[j];
+				
+				if (this.modules[row][col] !== null) {
+					continue;
+				}
+				
+				for (var r = -2; r <= 2; r++) {
+				
+					for (var c = -2; c <= 2; c++) {
+					
+						if (Math.abs(r) === 2 || 
+                            Math.abs(c) === 2 ||
+                            (r === 0 && c === 0) ) {
+							this.modules[row + r][col + c] = true;
+						} else {
+							this.modules[row + r][col + c] = false;
+						}
+					}
+				}
+			}
+		}
+	},
+	
+	setupTypeNumber : function(test) {
+	
+		var bits = QRUtil.getBCHTypeNumber(this.typeNumber);
+        var mod;
+	
+		for (var i = 0; i < 18; i++) {
+			mod = (!test && ( (bits >> i) & 1) === 1);
+			this.modules[Math.floor(i / 3)][i % 3 + this.moduleCount - 8 - 3] = mod;
+		}
+	
+		for (var x = 0; x < 18; x++) {
+			mod = (!test && ( (bits >> x) & 1) === 1);
+			this.modules[x % 3 + this.moduleCount - 8 - 3][Math.floor(x / 3)] = mod;
+		}
+	},
+	
+	setupTypeInfo : function(test, maskPattern) {
+	
+		var data = (this.errorCorrectLevel << 3) | maskPattern;
+		var bits = QRUtil.getBCHTypeInfo(data);
+        var mod;
+	
+		// vertical		
+		for (var v = 0; v < 15; v++) {
+	
+			mod = (!test && ( (bits >> v) & 1) === 1);
+	
+			if (v < 6) {
+				this.modules[v][8] = mod;
+			} else if (v < 8) {
+				this.modules[v + 1][8] = mod;
+			} else {
+				this.modules[this.moduleCount - 15 + v][8] = mod;
+			}
+		}
+	
+		// horizontal
+		for (var h = 0; h < 15; h++) {
+	
+			mod = (!test && ( (bits >> h) & 1) === 1);
+			
+			if (h < 8) {
+				this.modules[8][this.moduleCount - h - 1] = mod;
+			} else if (h < 9) {
+				this.modules[8][15 - h - 1 + 1] = mod;
+			} else {
+				this.modules[8][15 - h - 1] = mod;
+			}
+		}
+	
+		// fixed module
+		this.modules[this.moduleCount - 8][8] = (!test);
+	
+	},
+	
+	mapData : function(data, maskPattern) {
+		
+		var inc = -1;
+		var row = this.moduleCount - 1;
+		var bitIndex = 7;
+		var byteIndex = 0;
+		
+		for (var col = this.moduleCount - 1; col > 0; col -= 2) {
+	
+			if (col === 6) col--;
+	
+			while (true) {
+	
+				for (var c = 0; c < 2; c++) {
+					
+					if (this.modules[row][col - c] === null) {
+						
+						var dark = false;
+	
+						if (byteIndex < data.length) {
+							dark = ( ( (data[byteIndex] >>> bitIndex) & 1) === 1);
+						}
+	
+						var mask = QRUtil.getMask(maskPattern, row, col - c);
+	
+						if (mask) {
+							dark = !dark;
+						}
+						
+						this.modules[row][col - c] = dark;
+						bitIndex--;
+	
+						if (bitIndex === -1) {
+							byteIndex++;
+							bitIndex = 7;
+						}
+					}
+				}
+								
+				row += inc;
+	
+				if (row < 0 || this.moduleCount <= row) {
+					row -= inc;
+					inc = -inc;
+					break;
+				}
+			}
+		}
+		
+	}
+
+};
+
+QRCode.PAD0 = 0xEC;
+QRCode.PAD1 = 0x11;
+
+QRCode.createData = function(typeNumber, errorCorrectLevel, dataList) {
+	
+	var rsBlocks = QRRSBlock.getRSBlocks(typeNumber, errorCorrectLevel);
+	
+	var buffer = new QRBitBuffer();
+	
+	for (var i = 0; i < dataList.length; i++) {
+		var data = dataList[i];
+		buffer.put(data.mode, 4);
+		buffer.put(data.getLength(), QRUtil.getLengthInBits(data.mode, typeNumber) );
+		data.write(buffer);
+	}
+
+	// calc num max data.
+	var totalDataCount = 0;
+	for (var x = 0; x < rsBlocks.length; x++) {
+		totalDataCount += rsBlocks[x].dataCount;
+	}
+
+	if (buffer.getLengthInBits() > totalDataCount * 8) {
+		throw new Error("code length overflow. (" + 
+            buffer.getLengthInBits() + 
+            ">" +  
+            totalDataCount * 8 + 
+            ")");
+	}
+
+	// end code
+	if (buffer.getLengthInBits() + 4 <= totalDataCount * 8) {
+		buffer.put(0, 4);
+	}
+
+	// padding
+	while (buffer.getLengthInBits() % 8 !== 0) {
+		buffer.putBit(false);
+	}
+
+	// padding
+	while (true) {
+		
+		if (buffer.getLengthInBits() >= totalDataCount * 8) {
+			break;
+		}
+		buffer.put(QRCode.PAD0, 8);
+		
+		if (buffer.getLengthInBits() >= totalDataCount * 8) {
+			break;
+		}
+		buffer.put(QRCode.PAD1, 8);
+	}
+
+	return QRCode.createBytes(buffer, rsBlocks);
+};
+
+QRCode.createBytes = function(buffer, rsBlocks) {
+
+	var offset = 0;
+	
+	var maxDcCount = 0;
+	var maxEcCount = 0;
+	
+	var dcdata = new Array(rsBlocks.length);
+	var ecdata = new Array(rsBlocks.length);
+	
+	for (var r = 0; r < rsBlocks.length; r++) {
+
+		var dcCount = rsBlocks[r].dataCount;
+		var ecCount = rsBlocks[r].totalCount - dcCount;
+
+		maxDcCount = Math.max(maxDcCount, dcCount);
+		maxEcCount = Math.max(maxEcCount, ecCount);
+		
+		dcdata[r] = new Array(dcCount);
+		
+		for (var i = 0; i < dcdata[r].length; i++) {
+			dcdata[r][i] = 0xff & buffer.buffer[i + offset];
+		}
+		offset += dcCount;
+		
+		var rsPoly = QRUtil.getErrorCorrectPolynomial(ecCount);
+		var rawPoly = new QRPolynomial(dcdata[r], rsPoly.getLength() - 1);
+
+		var modPoly = rawPoly.mod(rsPoly);
+		ecdata[r] = new Array(rsPoly.getLength() - 1);
+		for (var x = 0; x < ecdata[r].length; x++) {
+            var modIndex = x + modPoly.getLength() - ecdata[r].length;
+			ecdata[r][x] = (modIndex >= 0)? modPoly.get(modIndex) : 0;
+		}
+
+	}
+	
+	var totalCodeCount = 0;
+	for (var y = 0; y < rsBlocks.length; y++) {
+		totalCodeCount += rsBlocks[y].totalCount;
+	}
+
+	var data = new Array(totalCodeCount);
+	var index = 0;
+
+	for (var z = 0; z < maxDcCount; z++) {
+		for (var s = 0; s < rsBlocks.length; s++) {
+			if (z < dcdata[s].length) {
+				data[index++] = dcdata[s][z];
+			}
+		}
+	}
+
+	for (var xx = 0; xx < maxEcCount; xx++) {
+		for (var t = 0; t < rsBlocks.length; t++) {
+			if (xx < ecdata[t].length) {
+				data[index++] = ecdata[t][xx];
+			}
+		}
+	}
+
+	return data;
+
+};
+
+module.exports = QRCode;
+
+};
+return libRequire("index");
+})();
+</script>
+<script>
+'use strict';
+(() => {
+const ISSUER = 'TOTP Classroom Lab';
+const STORE_KEY = 'totp-classroom-lab-v1';
+const PERIOD=30, DIGITS=6, ALPHABET='ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+const $ = id => document.getElementById(id);
+const els = {accountList:$('accountList'),accountCount:$('accountCount'),selectedName:$('selectedName'),qrFrame:$('qrFrame'),qrHidden:$('qrHidden'),otpDigits:$('otpDigits'),remaining:$('remaining'),countRing:$('countRing'),localClock:$('localClock'),secretBox:$('secretBox'),secretValue:$('secretValue'),verifyResult:$('verifyResult'),verifyInput:$('verifyInput'),verifyBtn:$('verifyBtn'),offlineConclusion:$('offlineConclusion'),offlineStatus:$('offlineStatus'),unixTime:$('unixTime'),counterVal:$('counterVal'),resultVal:$('resultVal')};
+let accounts=[], selectedId=null, modalMode=null, modalId=null;
+let showQr=true, showSecret=false, lastPaintedStep=null, lastPaintedId=null;
+let lastOtp='', tokenRequestId=0, verifyRequestId=0, cryptoAvailable=!!(globalThis.crypto && crypto.subtle && crypto.getRandomValues);
+let storageAvailable=true, toastTimer=null, importedKeys=new Map();
+function toast(message,error=false){const el=$('toast');clearTimeout(toastTimer);el.textContent=message;el.classList.toggle('error',error);el.classList.remove('hidden');toastTimer=setTimeout(()=>el.classList.add('hidden'),3700);}
+function escapeUri(s){return encodeURIComponent(s);}
+function randomSecret(){const array=new Uint8Array(20);crypto.getRandomValues(array);return base32Encode(array);}
+function base32Encode(bytes){let value=0,bits=0,out='';for(const b of bytes){value=(value<<8)|b;bits+=8;while(bits>=5){out+=ALPHABET[(value>>>(bits-5))&31];bits-=5;value&=(1<<bits)-1;}}if(bits>0)out+=ALPHABET[(value<<(5-bits))&31];return out;}
+function base32Decode(str){if(!/^[A-Z2-7]+$/.test(str))throw new Error('無效的 Base32 Secret Key');let value=0,bits=0,output=[];for(const c of str){value=(value<<5)|ALPHABET.indexOf(c);bits+=5;if(bits>=8){output.push((value>>>(bits-8))&255);bits-=8;value&=(1<<bits)-1;}}return new Uint8Array(output);}
+function bytesToBase32(s){return base32Encode(new TextEncoder().encode(s));}
+async function importedKey(secret){if(!cryptoAvailable)throw new Error('這個環境不支援 Web Crypto。請改用 HTTPS、localhost 或支援的安全瀏覽器。');if(importedKeys.has(secret))return importedKeys.get(secret);const promise=crypto.subtle.importKey('raw',base32Decode(secret),{name:'HMAC',hash:'SHA-1'},false,['sign']);importedKeys.set(secret,promise);try{return await promise;}catch(err){importedKeys.delete(secret);throw err;}}
+async function hotp(secret,counter,digits=DIGITS){const msg=new Uint8Array(8);let n=BigInt(counter);for(let i=7;i>=0;i--){msg[i]=Number(n&255n);n>>=8n;}const signature=new Uint8Array(await crypto.subtle.sign('HMAC',await importedKey(secret),msg));const offset=signature[signature.length-1]&15;const num=(((signature[offset]&127)<<24)|((signature[offset+1]&255)<<16)|((signature[offset+2]&255)<<8)|(signature[offset+3]&255))>>>0;return String(num%(10**digits)).padStart(digits,'0');}
+async function totp(secret, unixSeconds, digits=DIGITS){return hotp(secret,Math.floor(unixSeconds/PERIOD),digits);}
+const currentAccount=()=>accounts.find(a=>a.id===selectedId)||null;
+function newId(){if(crypto.randomUUID)return crypto.randomUUID();const b=new Uint8Array(16);crypto.getRandomValues(b);return Array.from(b,x=>x.toString(16).padStart(2,'0')).join('');}
+function persist(){try{localStorage.setItem(STORE_KEY,JSON.stringify({version:1,accounts,selectedId}));storageAvailable=true;}catch(err){storageAvailable=false;$('storageWarn').hidden=false;}}
+function load(){let hadSaved=false;try{const saved=localStorage.getItem(STORE_KEY);if(saved){const parsed=JSON.parse(saved);if(Array.isArray(parsed.accounts)){hadSaved=true;accounts=parsed.accounts.filter(a=>a&&typeof a.id==='string'&&typeof a.name==='string'&&typeof a.secret==='string'&&/^[A-Z2-7]{32}$/.test(a.secret)).slice(0,150).map(a=>({id:a.id,name:a.name.slice(0,32),secret:a.secret}));selectedId=parsed.selectedId;}}}catch(err){storageAvailable=false;$('storageWarn').hidden=false;}if(!hadSaved&&!accounts.length&&cryptoAvailable){accounts=[{id:newId(),name:'ICT-Demo-01',secret:randomSecret()}];selectedId=accounts[0].id;persist();}if(!accounts.some(a=>a.id===selectedId))selectedId=accounts[0]?.id||null;}
+function icons(name){const paths={edit:'<path d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L10 16l-4 1 1-4z"/>',trash:'<path d="M3 6h18M8 6V4h8v2M6 6l1 15h10l1-15M10 10v7M14 10v7"/>'};return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths[name]}</svg>`;}
+function renderAccounts(){els.accountList.replaceChildren();$('accountCount').textContent=`${accounts.length} 個`;$('clearAllBtn').disabled=!accounts.length;
+ if(!accounts.length){const div=document.createElement('div');div.className='empty';div.textContent='尚未有示範帳號。按「新增」開始課堂實驗。';els.accountList.appendChild(div);return;}
+ accounts.forEach((account,i)=>{const item=document.createElement('div');item.className='account-item'+(account.id===selectedId?' active':'');const btn=document.createElement('button');btn.type='button';btn.className='account-main';btn.title=`選取 ${account.name}`;const avatar=document.createElement('span');avatar.className='avatar';avatar.textContent=String(i+1).padStart(2,'0');const labels=document.createElement('span');labels.className='account-label';const strong=document.createElement('strong');strong.textContent=account.name;const caption=document.createElement('small');caption.textContent=account.id===selectedId?'● 正在展示':'按此選取';labels.append(strong,caption);btn.append(avatar,labels);btn.addEventListener('click',()=>selectAccount(account.id));const tools=document.createElement('span');tools.className='action-icons';for(const kind of ['edit','trash']){const b=document.createElement('button');b.type='button';b.title=kind==='edit'?'重新命名':'刪除帳號';b.setAttribute('aria-label',`${b.title}：${account.name}`);b.innerHTML=icons(kind);b.addEventListener('click',()=>openModal(kind==='edit'?'rename':'delete',account.id));tools.appendChild(b);}item.append(btn,tools);els.accountList.appendChild(item);});}
+function otpauthUrl(a){return `otpauth://totp/${escapeUri(ISSUER)}:${escapeUri(a.name)}?secret=${a.secret}&issuer=${escapeUri(ISSUER)}&algorithm=SHA1&digits=6&period=30`;}
+function drawQr(account){els.qrFrame.replaceChildren();if(!account){els.qrFrame.textContent='先新增帳號';return;}try{const qr=new QRCodeEngine(-1,0);qr.addData(otpauthUrl(account));qr.make();const modules=qr.getModuleCount();const size=modules+8;const xmlns='http://www.w3.org/2000/svg';const svg=document.createElementNS(xmlns,'svg');svg.setAttribute('viewBox',`0 0 ${size} ${size}`);svg.setAttribute('role','img');svg.setAttribute('aria-label',`${account.name} 的 TOTP 配對 QR Code`);const bg=document.createElementNS(xmlns,'rect');bg.setAttribute('width',size);bg.setAttribute('height',size);bg.setAttribute('fill','#ffffff');const path=document.createElementNS(xmlns,'path');let d='';for(let r=0;r<modules;r++)for(let c=0;c<modules;c++)if(qr.isDark(r,c))d+=`M${c+4} ${r+4}h1v1h-1z` ;path.setAttribute('d',d);path.setAttribute('fill','#101b2f');svg.append(bg,path);els.qrFrame.append(svg);}catch(err){els.qrFrame.textContent='無法建立 QR Code：'+err.message;toast('QR Code 產生失敗，請縮短帳號名稱。',true);}}
+function updateQrVisibility(){els.qrFrame.classList.toggle('hidden',!showQr);els.qrHidden.classList.toggle('hidden',showQr);$('toggleQrBtn').textContent=showQr?'隱藏 QR':'顯示 QR';}
+function drawSecret(){const a=currentAccount();els.secretValue.textContent=(!a)?'—':showSecret?a.secret.match(/.{1,4}/g).join(' '):'•••• •••• •••• •••• •••• •••• •••• ••••';$('secretToggle').textContent=showSecret?'隱藏':'顯示';$('copySecret').disabled=!a;$('manualBtn').disabled=!a;}
+function selectAccount(id){if(!accounts.some(a=>a.id===id))return;selectedId=id;lastPaintedStep=null;lastPaintedId=null;lastOtp='';tokenRequestId++;verifyRequestId++;clearVerification();showSecret=false;showQr=true;persist();renderAll();}
+function renderAll(){renderAccounts();const a=currentAccount();els.selectedName.textContent=a?.name||'尚未選取帳號';$('verifyInput').disabled=!a||!cryptoAvailable;$('verifyBtn').disabled=!a||!cryptoAvailable;$('toggleQrBtn').disabled=!a;drawQr(a);updateQrVisibility();drawSecret();tick(true);}
+function clearVerification(){els.verifyResult.className='result hidden';els.verifyResult.textContent='';els.verifyInput.value='';}
+function showVerification(message,kind){els.verifyResult.textContent=message;els.verifyResult.className='result '+kind;}
+async function updateOtp(a,step){const request=++tokenRequestId;els.otpDigits.textContent='••• •••';try{const otp=await hotp(a.secret,step);if(request!==tokenRequestId||currentAccount()?.id!==a.id||Math.floor(Date.now()/1000/PERIOD)!==step)return;lastOtp=otp;els.otpDigits.textContent=otp.slice(0,3)+' '+otp.slice(3);els.otpDigits.classList.remove('new');void els.otpDigits.offsetWidth;els.otpDigits.classList.add('new');els.resultVal.textContent=otp;}catch(err){if(request!==tokenRequestId)return;els.otpDigits.textContent='無法計算';els.otpDigits.style.fontSize='22px';toast(err.message,true);}}
+function tick(force=false){const now=Date.now(),sec=Math.floor(now/1000),step=Math.floor(sec/PERIOD),remainingMs=PERIOD*1000-(now%(PERIOD*1000));els.remaining.textContent=String(Math.ceil(remainingMs/1000));const pct=remainingMs/(PERIOD*1000)*100;els.countRing.style.setProperty('--p',pct+'%');els.countRing.style.setProperty('--ring-color',remainingMs<=5000?'#dc5965':'#3974ed');els.localClock.textContent='本機時間：'+new Date(now).toLocaleTimeString('zh-HK',{hour12:false});els.unixTime.textContent=sec.toString();els.counterVal.textContent=step.toString();
+ const a=currentAccount();if(!a){els.otpDigits.textContent='——— ———';els.resultVal.textContent='—';lastPaintedStep=null;lastPaintedId=null;return;}if(!cryptoAvailable){els.otpDigits.textContent='不支援加密 API';els.otpDigits.style.fontSize='20px';return;}
+ if(force||step!==lastPaintedStep||a.id!==lastPaintedId){lastPaintedStep=step;lastPaintedId=a.id;els.otpDigits.style.fontSize='';updateOtp(a,step);}}
+async function verifyToken(e){e.preventDefault();const a=currentAccount();if(!a)return;const typed=els.verifyInput.value.trim();if(!/^\d{6}$/.test(typed)){showVerification('請先輸入完整 6 位數 OTP（包括開頭的 0）。','warn');return;}
+ const request=++verifyRequestId;const checkAt=Math.floor(Date.now()/1000),checkStep=Math.floor(checkAt/PERIOD),accountId=a.id;$('verifyBtn').disabled=true;try{const expected=await hotp(a.secret,checkStep);if(request!==verifyRequestId||currentAccount()?.id!==accountId)return;
+ if(typed===expected){showVerification('✓ 驗證成功！手機與網頁用相同 Secret Key 及時間區間，算出相同的 OTP。','ok');return;}
+ const [prev,next]=await Promise.all([hotp(a.secret,checkStep-1),hotp(a.secret,checkStep+1)]);if(request!==verifyRequestId||currentAccount()?.id!==accountId)return;
+ if(typed===prev||typed===next)showVerification('時間區間不一致：輸入的密碼對應相鄰的 30 秒區間。請檢查兩部裝置的時間，並重試。','warn');else showVerification('OTP 不相同。請檢查選取的帳號、手機時間，並確認掃描了正確的 QR Code。','bad');
+ }catch(err){if(request===verifyRequestId)showVerification('驗證失敗：'+err.message,'bad');}finally{if(request===verifyRequestId)$('verifyBtn').disabled=!currentAccount()||!cryptoAvailable;}}
+function openModal(mode,id=null){modalMode=mode;modalId=id;const a=accounts.find(x=>x.id===id);const isName=mode==='add'||mode==='rename';$('nameField').classList.toggle('hidden',!isName);$('dangerMsg').classList.toggle('hidden',isName);$('modalError').textContent='';$('confirmModalBtn').className='btn '+(isName?'primary':'danger');$('accountNameInput').value=mode==='rename'?a?.name||'':'';const definitions={add:['新增示範帳號','每個新帳號會獲得一把獨立、隨機的 Secret Key。','建立帳號'],rename:['重新命名帳號','只修改此網頁的帳號名稱，不會改變 Secret Key，也不會自動改變手機 Authenticator 裡的顯示名稱。','儲存名稱'],delete:['刪除帳號','刪除後將失去此帳號儲存的 Secret Key，已配對的手機仍會顯示 OTP，但網頁無法再對照。','確認刪除'],clear:['清除全部帳號','這會刪除本瀏覽器所有示範帳號和 Secret Key，而且不能還原。','全部清除']};const [title,desc,label]=definitions[mode];$('modalTitle').textContent=title;$('modalDescription').textContent=desc;$('confirmModalBtn').textContent=label;if(!isName)$('dangerMsg').textContent=mode==='delete'?`即將刪除：「${a?.name||'未知帳號'}」`:'所有帳號會被永久清除（僅限此瀏覽器）。';$('modalOverlay').classList.remove('hidden');setTimeout(()=>{if(isName)$('accountNameInput').focus();else $('confirmModalBtn').focus();},0);}
+function closeModal(){$('modalOverlay').classList.add('hidden');modalMode=null;modalId=null;}
+function submitModal(e){e.preventDefault();if(!modalMode)return;const mode=modalMode,a=accounts.find(x=>x.id===modalId);if(mode==='add'||mode==='rename'){const name=$('accountNameInput').value.trim();if(!name){$('modalError').textContent='請輸入帳號名稱。';return;}if(Array.from(name).length>32){$('modalError').textContent='名稱不可超過 32 個字元。';return;}if(accounts.some(x=>x.id!==modalId&&x.name.toLocaleLowerCase()===name.toLocaleLowerCase())){$('modalError').textContent='已存在同名帳號，請輸入另一個名稱。';return;}if(mode==='add'){if(!cryptoAvailable){$('modalError').textContent='無法使用安全隨機數 API，請使用 HTTPS 或支援的瀏覽器。';return;}const created={id:newId(),name,secret:randomSecret()};accounts.push(created);selectedId=created.id;importedKeys.clear();}else if(a){a.name=name;}}
+ else if(mode==='delete'){if(!a)return;accounts=accounts.filter(x=>x.id!==a.id);importedKeys.delete(a.secret);if(selectedId===a.id)selectedId=accounts[0]?.id||null;}else if(mode==='clear'){accounts=[];selectedId=null;importedKeys.clear();}
+ showQr=true;showSecret=false;lastPaintedStep=null;lastPaintedId=null;tokenRequestId++;verifyRequestId++;clearVerification();persist();closeModal();renderAll();toast(mode==='add'?'已建立示範帳號':mode==='rename'?'名稱已更新（Secret Key 不變）':mode==='delete'?'帳號已刪除':'所有帳號已清除');}
+async function copySecret(){const a=currentAccount();if(!a)return;try{if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(a.secret);}else{const field=document.createElement('textarea');field.value=a.secret;field.style.position='fixed';field.style.opacity='0';document.body.appendChild(field);field.select();const ok=document.execCommand('copy');field.remove();if(!ok)throw new Error('copy unavailable');}toast('已複製 Secret Key（請勿分享正式帳號金鑰）');}catch(err){showSecret=true;drawSecret();toast('無法自動複製，已顯示 Secret Key 供手動複製。',true);}}
+function offlineUpdate(){const inputs=[...document.querySelectorAll('#offlineSteps input')];const count=inputs.filter(x=>x.checked).length;els.offlineStatus.textContent=`已完成 ${count} / 4 個步驟`;els.offlineConclusion.classList.toggle('hidden',count!==4);}
+async function selfTest(){const btn=$('selfTestBtn');btn.disabled=true;$('selfTestResult').textContent='測試中…';try{const secret=bytesToBase32('12345678901234567890');const cases=[[59,'94287082'],[1111111109,'07081804'],[1111111111,'14050471'],[1234567890,'89005924'],[2000000000,'69279037'],[20000000000,'65353130']];for(const [ts,want] of cases){const got=await totp(secret,ts,8);if(got!==want)throw new Error(`t=${ts}: ${got} ≠ ${want}`);}const got6=await totp(secret,59,6);if(got6!=='287082')throw new Error('六位數輸出錯誤');$('selfTestResult').textContent='✓ 6 組官方向量全部通過';$('selfTestResult').style.color='#118765';}catch(err){$('selfTestResult').textContent='✗ 測試失敗：'+err.message;$('selfTestResult').style.color='#d44857';}finally{btn.disabled=false;}}
+$('addBtn').addEventListener('click',()=>openModal('add'));$('clearAllBtn').addEventListener('click',()=>openModal('clear'));
+$('accountForm').addEventListener('submit',submitModal);$('cancelModalBtn').addEventListener('click',closeModal);$('modalOverlay').addEventListener('click',e=>{if(e.target===$('modalOverlay'))closeModal();});document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('modalOverlay').classList.contains('hidden'))closeModal();});
+$('toggleQrBtn').addEventListener('click',()=>{showQr=!showQr;updateQrVisibility();});$('manualBtn').addEventListener('click',()=>{$('secretBox').classList.toggle('hidden');});$('secretToggle').addEventListener('click',()=>{showSecret=!showSecret;drawSecret();});$('copySecret').addEventListener('click',copySecret);
+$('verifyInput').addEventListener('input',e=>{e.target.value=e.target.value.replace(/\D/g,'').slice(0,6);});$('verifyForm').addEventListener('submit',verifyToken);
+$('offlineSteps').addEventListener('change',offlineUpdate);$('resetExperiment').addEventListener('click',()=>{document.querySelectorAll('#offlineSteps input').forEach(x=>x.checked=false);offlineUpdate();});
+$('theoryToggle').addEventListener('click',()=>{const open=$('theoryToggle').getAttribute('aria-expanded')==='true';$('theoryToggle').setAttribute('aria-expanded',String(!open));$('theoryContent').classList.toggle('hidden',open);});$('selfTestBtn').addEventListener('click',selfTest);
+$('presentBtn').addEventListener('click',()=>{const active=document.body.classList.toggle('presentation');$('presentBtn').textContent=active?'↙ 退出投影':'⛶ 投影模式';window.scrollTo({top:0,behavior:'smooth'});});
+if(!cryptoAvailable){$('addBtn').disabled=true;toast('缺少安全 Web Crypto API。請用 HTTPS（例如 GitHub Pages）開啟本網頁。',true);}
+load();renderAll();offlineUpdate();setInterval(()=>tick(),120);document.addEventListener('visibilitychange',()=>{if(!document.hidden)tick(true);});
+})();
+</script>
+</body>
+</html>
